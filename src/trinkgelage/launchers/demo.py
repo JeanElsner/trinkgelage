@@ -13,4 +13,4 @@ def main() -> None:
     while input() != "q":
         sm.pick_cup(user=True)
 
-    sm._graph().write_png("tmp.png")
+    sm._graph().write_png("tmp.png")  # pylint: disable=no-member, protected-access
