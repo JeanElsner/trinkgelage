@@ -1,0 +1,12 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: 2024.04.23
+_src_path: gh:scientific-python/cookie
+backend: hatch
+email: jean.elsner@tum.de
+full_name: Jean Elsner
+license: Apache
+org: JeanElsner
+project_name: trinkgelage
+project_short_description: A beer tapping demo.
+url: https://github.com/JeanElsner/trinkgelage
+vcs: true
