@@ -33,7 +33,7 @@ dynamic = ["version"]
 dependencies = [
   "panda-python",
   "python-statemachine",
-  "pydot",
+  "simple-term-menu",
 ]
 
 [project.optional-dependencies]

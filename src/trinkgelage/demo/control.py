@@ -26,7 +26,9 @@ class DemoControl(statemachine.StateMachine):  # type: ignore[misc]
         cups_empty, unless="cup_available"
     )
     refill_cups = cups_empty.to(idle)
-    open_faucet = holding_empty_cup.to(pouring, on="measure_cup")
+    open_faucet = holding_empty_cup.to(
+        pouring, on="measure_cup", cond="cup_grasped"
+    ) | holding_empty_cup.to(idle, unless="cup_grasped")
     close_faucet = pouring.to(holding_filled_cup, cond="cup_full") | pouring.to(
         pouring, unless="cup_full", on="measure_cup"
     )
@@ -137,10 +139,18 @@ class DemoModel:
             # actions.motion_from_file("move_cup_to_faucet.csv")
             # TODO pick up cup, move to faucet, bias force sensor, grasp faucet if user False
 
-    def on_open_faucet(self, user: bool = False) -> None:
-        if not user:
-            actions.grasp(self.left_gripper)
-            actions.motion_from_file(self.left, "open_faucet.csv")
+    def on_open_faucet(self, target: statemachine.State, user: bool = False) -> None:
+        if target == DemoControl.pouring:
+            if not user:
+                actions.grasp(self.left_gripper)
+                actions.motion_from_file(self.left, "open_faucet.csv")
+        else:
+            actions.two_arm_motion_from_files(
+                self.left,
+                self.right,
+                "left_idle.csv",
+                ["post_place_cup.csv", "right_idle.csv"],
+            )
         # TODO open faucet if user is false
 
     def on_close_faucet(self, target: statemachine.State, user: bool = False) -> None:
@@ -198,3 +208,6 @@ class DemoModel:
     def user_pickup(self) -> bool:
         log.info("Checking if user picked up cup...")
         return True
+
+    def cup_grasped(self) -> bool:
+        return self.right_gripper.read_once().width > 0.05 and self.right_gripper.grasp
