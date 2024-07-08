@@ -43,7 +43,7 @@ def main() -> None:
         default=1,
         help="Cup position to start the demo",
     )
-    parser.add_argument("--gui-hostname", type=str, default="gap-nuc-003.rsi.ei.tum.de")
+    parser.add_argument("--gui-hostname", type=str, default="gap-nuc-003.local")
     parser.add_argument("--gui-port", type=int, default=8000)
     args = parser.parse_args()
 
@@ -51,7 +51,12 @@ def main() -> None:
     terminal_menu = simple_term_menu.TerminalMenu(options)
 
     left, right = utils.get_robot_hostnames()
-    model = control.DemoModel(left, right, gui_url=f"http://{args.gui_hostname}:{args.gui_port}", start_position=args.start_position)
+    model = control.DemoModel(
+        left,
+        right,
+        gui_url=f"http://{args.gui_hostname}:{args.gui_port}",
+        start_position=args.start_position,
+    )
     sm = control.DemoControl(model)
     btn = StartDemo(sm, terminal_menu)
 

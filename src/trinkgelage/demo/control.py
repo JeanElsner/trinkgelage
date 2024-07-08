@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import logging
-from xmlrpc import client
 import time
+from xmlrpc import client
+
 import numpy as np
 import panda_py
 import statemachine  # type: ignore[import-not-found]
@@ -67,7 +68,7 @@ class DemoModel:
         left: str,
         right: str,
         enforce_rt: bool = True,
-        gui_url: str = "http://gap-nuc-003.local:8000",
+        gui_url: str = "http://garmi-gui.local:8000",
         start_position: int = 1,
     ) -> None:
         self.cups = np.clip(self.max_cups - (start_position - 1), 0, 12)
