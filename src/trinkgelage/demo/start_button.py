@@ -47,10 +47,13 @@ class StartButton(abc.ABC):
                     try:
                         line = ser.readline().decode("utf-8", errors="ignore").strip()
                         if line:
-                            state = int(line.split(",")[1].split("=")[1])
-                            if self.previous_state == 1 and state == 0:
-                                self.handle_event()
-                            self.previous_state = state
+                            for key_value in line.split(","):
+                                pair = key_value.split("=")
+                                if pair[0].lower() == "btn" and len(pair) == 2:
+                                    state = int(pair[1])
+                                    if self.previous_state == 1 and state == 0:
+                                        self.handle_event()
+                                    self.previous_state = state
                     except UnicodeDecodeError as e:
                         logging.error("Decode error on %s: %s", port, e)
                     time.sleep(0.01)  # Small sleep to reduce CPU usage
