@@ -21,10 +21,10 @@ class StartButton(abc.ABC):
         for port in ports:
             if "ttyACM" in port.device:
                 try:
-                    with serial.Serial(port.device, 9600, timeout=1) as ser:
-                        ser.readlines(3)
+                    with serial.Serial(port.device, 9600, timeout=1) as tty:
+                        tty.readlines(3)
                         line = (
-                            ser.readline()
+                            tty.readline()
                             .decode("utf-8", errors="ignore")
                             .strip()
                             .lower()
@@ -42,10 +42,10 @@ class StartButton(abc.ABC):
 
     def loop(self, port: str) -> None:
         try:
-            with serial.Serial(port, 9600, timeout=0.1) as ser:
+            with serial.Serial(port, 9600, timeout=0.1) as tty:
                 while not self.stop_threads.is_set():
                     try:
-                        line = ser.readline().decode("utf-8", errors="ignore").strip()
+                        line = tty.readline().decode("utf-8", errors="ignore").strip()
                         if line:
                             for key_value in line.split(","):
                                 pair = key_value.split("=")

@@ -60,8 +60,6 @@ def main() -> None:
     sm = control.DemoControl(model)
     btn = StartDemo(sm, terminal_menu)
 
-    sm._graph().write("statemachine.png", format="png")  # pylint: disable=no-member, protected-access
-
     while True:
         choice = terminal_menu.show()
         if choice == 0 and sm.current_state == control.DemoControl.idle:
