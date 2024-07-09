@@ -54,10 +54,10 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/JeanElsner/trinkgelage"
-"Bug Tracker" = "https://github.com/JeanElsner/trinkgelage/issues"
-Discussions = "https://github.com/JeanElsner/trinkgelage/discussions"
-Changelog = "https://github.com/JeanElsner/trinkgelage/releases"
+Homepage = "https://github.com/tum-robotics/trinkgelage"
+"Bug Tracker" = "https://github.com/tum-robotics/trinkgelage/issues"
+Discussions = "https://github.com/tum-robotics/trinkgelage/discussions"
+Changelog = "https://github.com/tum-robotics/trinkgelage/releases"
 
 [project.scripts]
 trinkgelage-demo = "trinkgelage.launchers.demo:main"
