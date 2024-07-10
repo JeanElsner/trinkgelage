@@ -1,9 +1,16 @@
-# trinkgelage-gui
+# trinkgelage
 
 [![Actions Status][actions-badge]][actions-link]
 [![Documentation Status][rtd-badge]][rtd-link]
 [![PyPI version][pypi-version]][pypi-link]
 [![PyPI platforms][pypi-platforms]][pypi-link] [![codecov][cov-badge]][cov-link]
+
+<p align="center">
+	<img src="https://raw.githubusercontent.com/tum-robotics/trinkgelage/main/.github/trinkgelage.png">
+</p>
+
+Robotic two-arm demonstrator serving beer from a keg as shown at Geriatronics
+Summit 2024.
 
 <!-- SPHINX-START -->
 
