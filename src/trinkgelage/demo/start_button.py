@@ -30,7 +30,7 @@ class StartButton(abc.ABC):
                             .lower()
                         )
                         if "id=start_button" in line:
-                            return port.device
+                            return port.device  # type: ignore[no-any-return]
                 except serial.SerialException as e:
                     logging.error("Serial exception on %s: %s", port, e)
                 except UnicodeDecodeError as e:

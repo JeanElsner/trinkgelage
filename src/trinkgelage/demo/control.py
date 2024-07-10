@@ -6,7 +6,7 @@ from xmlrpc import client
 
 import numpy as np
 import panda_py
-import statemachine  # type: ignore[import-not-found]
+import statemachine
 from panda_py import libfranka
 
 from ..robot import actions
@@ -71,7 +71,7 @@ class DemoModel:
         gui_url: str = "http://garmi-gui.local:8000",
         start_position: int = 1,
     ) -> None:
-        self.cups = np.clip(self.max_cups - (start_position - 1), 0, 12)
+        self.cups: int = np.clip(self.max_cups - (start_position - 1), 0, 12)
         self.bias = np.zeros(6)
         self.load = np.zeros(6)
         if enforce_rt:
@@ -210,11 +210,12 @@ class DemoModel:
     def cup_full(self) -> bool:
         load = np.linalg.norm(self.load[:3] - self.bias[:3])
         self.gui.show_text(f"measuring...\n{load*100:3.0f}ml", *self.show_text_settings)
-        return load > 3.5
+        return bool(load > 3.5)
 
     def user_pickup(self) -> bool:
         time.sleep(5)
         return True
 
     def cup_grasped(self) -> bool:
-        return self.right_gripper.read_once().width > 0.02 and self.right_gripper.grasp
+        gripper_state = self.right_gripper.read_once()
+        return gripper_state.width > 0.02 and gripper_state.is_grasped

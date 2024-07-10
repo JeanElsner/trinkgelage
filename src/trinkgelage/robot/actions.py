@@ -6,6 +6,7 @@ import threading
 import typing
 
 import numpy as np
+import numpy.typing as npt
 import panda_py
 from panda_py import controllers, libfranka
 
@@ -23,7 +24,6 @@ def two_arm_motion_from_files(
     right_speed_factor: float = 0.2,
     max_retries: int = 3,
 ) -> None:
-    threads: list[threading.Thread] = []
     t_left = threading.Thread(
         target=motion_from_file,
         args=(left, left_filenames),
@@ -46,25 +46,22 @@ def motion_from_file(
     speed_factor: float = 0.2,
     max_retries: int = 3,
 ) -> bool:
-    if isinstance(filenames, str):
-        items = [filenames]
-    else:
-        items = list(filenames)
+    items = [filenames] if isinstance(filenames, str) else list(filenames)
 
-    queue: list[np.ndarray] = []
+    queue: list[npt.NDArray[np.float64]] = []
     last_shape = None
 
-    def process_queue(queue: list[np.ndarray]) -> bool:
+    def process_queue(queue: list[npt.NDArray[np.float64]]) -> bool:
         if not queue:
             return True
         shape = queue[0].shape
         if len(shape) == 1:
-            for q in queue:
+            for q in queue:  # type: ignore[unreachable]
                 assert q.shape[0] == 7
             return move_to_joint_position(
                 robot, queue, speed_factor=speed_factor, max_retries=max_retries
             )
-        elif len(shape) == 2:
+        if len(shape) == 2:
             success = True
             for q in queue:
                 assert q.shape[1] == 14
@@ -76,8 +73,7 @@ def motion_from_file(
                     max_retries=max_retries,
                 )
             return success
-        else:
-            raise RuntimeError("Invalid file format")
+        raise RuntimeError()
 
     success = True
     for fn in items:
@@ -95,13 +91,13 @@ def motion_from_file(
     return success
 
 
-def load_csv(filename: str) -> np.ndarray:
+def load_csv(filename: str) -> npt.NDArray[np.float64]:
     return np.loadtxt(DATA_PATH / filename, delimiter=",")
 
 
 def move_to_pose(
     robot: panda_py.Panda,
-    poses: np.ndarray | list[np.ndarray],
+    poses: npt.NDArray[np.float64] | list[npt.NDArray[np.float64]],
     speed_factor: float = 0.2,
     max_retries: int = 3,
 ) -> bool:
@@ -120,14 +116,13 @@ def move_to_pose(
                 speed_factor=speed_factor,
                 max_retries=max_retries - 1,
             )
-        else:
-            log.error("Maximum retries reached for move_to_joint_position")
-            return False
+        log.error("Maximum retries reached for move_to_joint_position")
+        return False
 
 
 def move_to_joint_position(
     robot: panda_py.Panda,
-    joint_positions: np.ndarray | list[np.ndarray],
+    joint_positions: npt.NDArray[np.float64] | list[npt.NDArray[np.float64]],
     speed_factor: float = 0.2,
     max_retries: int = 3,
 ) -> bool:
@@ -142,15 +137,14 @@ def move_to_joint_position(
                 speed_factor=speed_factor,
                 max_retries=max_retries - 1,
             )
-        else:
-            log.error("Maximum retries reached for move_to_joint_position")
-            return False
+        log.error("Maximum retries reached for move_to_joint_position")
+        return False
 
 
 def play_trajectory(
     robot: panda_py.Panda,
-    q: list[np.ndarray],
-    dq: list[np.ndarray],
+    q: npt.NDArray[np.float64],
+    dq: npt.NDArray[np.float64],
     at_index: int = 0,
     speed_factor: float = 0.05,
     max_retries: int = 3,
@@ -178,16 +172,15 @@ def play_trajectory(
                 speed_factor=speed_factor,
                 max_retries=max_retries - 1,
             )
-        else:
-            log.error("Maximum retries reached for play_trajectory")
-            return False
+        log.error("Maximum retries reached for play_trajectory")
+        return False
 
 
 def release(gripper: libfranka.Gripper) -> None:
     if not gripper.move(0.08, 0.05):
-        raise RuntimeError("Opening gripper failed")
+        raise RuntimeError()
 
 
 def grasp(gripper: libfranka.Gripper) -> None:
     if not gripper.grasp(0, 0.05, 20, 0.08, 0.08):
-        raise RuntimeError("Grasping failed")
+        raise RuntimeError()
