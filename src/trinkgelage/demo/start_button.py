@@ -10,6 +10,8 @@ import serial.tools.list_ports
 
 
 class StartButton(abc.ABC):
+    """Physical start button communicating over serial port."""
+
     def __init__(self) -> None:
         self.stop_threads = threading.Event()
         self.previous_state = 1
@@ -46,19 +48,22 @@ class StartButton(abc.ABC):
                 while not self.stop_threads.is_set():
                     try:
                         line = tty.readline().decode("utf-8", errors="ignore").strip()
-                        if line:
-                            for key_value in line.split(","):
-                                pair = key_value.split("=")
-                                if pair[0].lower() == "btn" and len(pair) == 2:
-                                    state = int(pair[1])
-                                    if self.previous_state == 1 and state == 0:
-                                        self.handle_event()
-                                    self.previous_state = state
+                        self.parse_line(line)
                     except UnicodeDecodeError as e:
                         logging.error("Decode error on %s: %s", port, e)
                     time.sleep(0.01)  # Small sleep to reduce CPU usage
         except serial.SerialException as e:
             logging.error("Serial exception on %s: %s", port, e)
+
+    def parse_line(self, line: str) -> None:
+        if line:
+            for key_value in line.split(","):
+                pair = key_value.split("=")
+                if pair[0].lower() == "btn" and len(pair) == 2:
+                    state = int(pair[1])
+                    if self.previous_state == 1 and state == 0:
+                        self.handle_event()
+                    self.previous_state = state
 
     def close(self) -> None:
         self.stop_threads.set()

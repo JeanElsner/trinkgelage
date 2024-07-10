@@ -34,6 +34,7 @@ dependencies = [
   "panda-python",
   "python-statemachine",
   "simple-term-menu",
+  "pyserial",
 ]
 
 [project.optional-dependencies]
@@ -162,3 +163,4 @@ messages_control.disable = [
   "missing-function-docstring",
   "wrong-import-position",
 ]
+extension-pkg-allow-list = ["panda_py.libfranka"]

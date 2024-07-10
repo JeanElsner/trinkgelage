@@ -14,10 +14,12 @@ logger = logging.getLogger("trinkgelage")
 
 
 class StartDemo(start_button.StartButton):
+    """Physical start button communicating over serial port."""
+
     def __init__(
-        self, control: control.DemoControl, menu: simple_term_menu.TerminalMenu
+        self, demo_control: control.DemoControl, menu: simple_term_menu.TerminalMenu
     ) -> None:
-        self.control = control
+        self.control = demo_control
         self.menu = menu
         super().__init__()
 
@@ -27,11 +29,11 @@ class StartDemo(start_button.StartButton):
             threading.Thread(target=self.run_demo).start()
         else:
             logger.warning("Demo already in progress")
-            self.menu._paint_menu()
+            self.menu._paint_menu()  # pylint: disable=protected-access
 
     def run_demo(self) -> None:
         self.control.start_demo()
-        self.menu._paint_menu()
+        self.menu._paint_menu()  # pylint: disable=protected-access
 
 
 def main() -> None:
