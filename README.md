@@ -6,7 +6,8 @@
 [![PyPI platforms][pypi-platforms]][pypi-link] [![codecov][cov-badge]][cov-link]
 
 Robotic two-arm demonstrator serving beer from a keg as shown at Geriatronics
-Summit 2024. Watch a video of the demo [here](https://www.youtube.com/shorts/Ao5W2cQ6zYw).
+Summit 2024. Watch a video of the demo
+[here](https://www.youtube.com/shorts/Ao5W2cQ6zYw).
 
 <p align="center">
 	<img src="https://raw.githubusercontent.com/tum-robotics/trinkgelage/main/.github/trinkgelage.png">
