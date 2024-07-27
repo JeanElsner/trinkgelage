@@ -13,6 +13,36 @@ Summit 2024. Watch a video of the demo
 	<img src="https://raw.githubusercontent.com/tum-robotics/trinkgelage/main/.github/trinkgelage.png">
 </p>
 
+## Install
+
+To install run
+
+```
+pip install trinkgelage
+```
+
+or if you're working with the code in a local clone of the repository
+
+```
+pip install -v -e .[dev]
+```
+
+## Run
+
+This Python package installs an executable for convenience. You can start the
+demo by running `trinkgelage-demo` from the environment where you installed the
+package. This program includes a terminal interface to control the demo
+manually. In order to run the program, you need to have two Franka robots
+connected with their respective hostnames/IPs available in the environment
+variables `PANDA_LEFT` and `PANDA_RIGHT`.
+
+## Requirements
+
+The robots are controlled using
+[panda-py](https://github.com/JeanElsner/panda-py), which is automatically
+installed from pypi as part of the requirements. However, if you use an older
+firmware or the FR3, you will need to manually install the correct version.
+
 <!-- SPHINX-START -->
 
 <!-- prettier-ignore-start -->
