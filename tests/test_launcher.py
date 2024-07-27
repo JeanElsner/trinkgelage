@@ -13,7 +13,9 @@ from trinkgelage.launchers import demo
 @mock.patch("trinkgelage.demo.control.DemoModel.cup_full", return_value=True)
 @mock.patch(
     "argparse.ArgumentParser.parse_args",
-    return_value=argparse.Namespace(gui_hostname="", gui_port=0, start_position=1),
+    return_value=argparse.Namespace(
+        gui_hostname="", gui_port=0, start_position=1, gui=True
+    ),
 )
 def test_launcher(
     mock_argparse, mock_cup_full, mock_proxy, mock_menu, mock_gripper, mock_panda
