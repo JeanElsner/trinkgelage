@@ -16,18 +16,25 @@ log = logging.getLogger("trinkgelage")
 
 
 class DemoControl(statemachine.StateMachine):  # type: ignore[misc]
-    """Control flow program of the demo."""
+    """Control flow program of the demo.
+    Describes the possible states and transitions of the statemachine."""
 
     idle = statemachine.State(initial=True)
+    """Idle state, wait for signal to execute demo."""
     start = statemachine.State()
+    """Received start signal."""
     holding_empty_cup = statemachine.State()
+    "Holding empty cup from the tray."
     pouring = statemachine.State()
+    """Pouring beer into cup."""
     holding_filled_cup = statemachine.State()
+    """Holding cup filled with beer."""
     cups_empty = statemachine.State()
+    """There are no more cups are available on the tray."""
     waiting_for_user_pickup = statemachine.State()
+    """Cup has been placed."""
 
     start_demo = idle.to(start)
-
     pick_cup = start.to(holding_empty_cup, cond="cup_available") | start.to(
         cups_empty, unless="cup_available"
     )
