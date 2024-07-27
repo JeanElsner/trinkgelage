@@ -45,6 +45,7 @@ def main() -> None:
         default=1,
         help="Cup position to start the demo",
     )
+    parser.add_argument("--gui", "-g", action="store_true", help="Connect to GUI")
     parser.add_argument("--gui-hostname", type=str, default="gap-nuc-003.local")
     parser.add_argument("--gui-port", type=int, default=8000)
     args = parser.parse_args()
@@ -56,6 +57,7 @@ def main() -> None:
     model = control.DemoModel(
         left,
         right,
+        use_gui=args.gui,
         gui_url=f"http://{args.gui_hostname}:{args.gui_port}",
         start_position=args.start_position,
     )

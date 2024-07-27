@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import threading
 import time
 from xmlrpc import client
 
@@ -68,6 +69,7 @@ class DemoModel:
         left: str,
         right: str,
         enforce_rt: bool = True,
+        use_gui: bool = False,
         gui_url: str = "http://garmi-gui.local:8000",
         start_position: int = 1,
     ) -> None:
@@ -82,21 +84,26 @@ class DemoModel:
         self.left_gripper = libfranka.Gripper(left)
         self.right = panda_py.Panda(right, realtime_config=rt)
         self.right_gripper = libfranka.Gripper(right)
-        self.gui = client.ServerProxy(gui_url)
+        self.gui: client.ServerProxy | None
+        if use_gui:
+            self.gui = client.ServerProxy(gui_url)
+        else:
+            self.gui = None
         self.render_text_settings = (10, (0, 255, 255), 200)
         self.show_text_settings = ((0, 255, 255), 200)
         self.init_robot()
 
     def on_enter_idle(self) -> None:
-        self.gui.show_image("sleep.png")
+        if self.gui:
+            self.gui.show_image("sleep.png")
 
     def init_robot(self) -> None:
-        # t1 = threading.Thread(target=self.left_gripper.homing)
-        # t2 = threading.Thread(target=self.right_gripper.homing)
-        # t1.start()
-        # t2.start()
-        # for t in [t1, t2]:
-        #     t.join()
+        t1 = threading.Thread(target=self.left_gripper.homing)
+        t2 = threading.Thread(target=self.right_gripper.homing)
+        t1.start()
+        t2.start()
+        for t in [t1, t2]:
+            t.join()
         actions.two_arm_motion_from_files(
             self.left, self.right, "left_idle.csv", "right_idle.csv"
         )
@@ -108,10 +115,11 @@ class DemoModel:
 
             idx = self.max_cups - self.cups
             log.info("Picking up cup at position %d", idx)
-            self.gui.play_sound("confirm.wav")
-            self.gui.render_text(
-                f"Picking up cup at position #{idx}...", *self.render_text_settings
-            )
+            if self.gui:
+                self.gui.play_sound("confirm.wav")
+                self.gui.render_text(
+                    f"Picking up cup at position #{idx}...", *self.render_text_settings
+                )
 
             disp_x = (idx - 1) % 3 * 0.15
             disp_z = -np.floor((idx - 1) / 3) * 0.1
@@ -131,7 +139,8 @@ class DemoModel:
             actions.grasp(self.right_gripper)
             actions.move_to_pose(self.right, post_grasp_cup)
 
-            self.gui.show_image("eyes.png")
+            if self.gui:
+                self.gui.show_image("eyes.png")
 
             if user:
                 actions.motion_from_file(self.right, "move_cup_to_faucet.csv")
@@ -144,7 +153,7 @@ class DemoModel:
                 )
 
             self.bias = np.array(self.right.get_state().O_F_ext_hat_K)
-        else:
+        elif self.gui:
             self.gui.play_sound("attention.wav")
             self.gui.render_text("Please refill cups!", *self.render_text_settings)
 
@@ -154,8 +163,11 @@ class DemoModel:
                 actions.grasp(self.left_gripper)
                 actions.motion_from_file(self.left, "open_faucet.csv")
         else:
-            self.gui.play_sound("failure.wav")
-            self.gui.render_text("I'm not holding a cup...", *self.render_text_settings)
+            if self.gui:
+                self.gui.play_sound("failure.wav")
+                self.gui.render_text(
+                    "I'm not holding a cup...", *self.render_text_settings
+                )
             actions.release(self.right_gripper)
             actions.two_arm_motion_from_files(
                 self.left,
@@ -166,8 +178,9 @@ class DemoModel:
 
     def on_close_faucet(self, target: statemachine.State, user: bool = False) -> None:
         if target == DemoControl.holding_filled_cup:
-            self.gui.show_image("happy.png")
-            self.gui.play_sound("success.wav")
+            if self.gui:
+                self.gui.show_image("happy.png")
+                self.gui.play_sound("success.wav")
             if not user:
                 actions.two_arm_motion_from_files(
                     self.left, self.right, "grasp_faucet.csv", "level_cup.csv"
@@ -181,8 +194,11 @@ class DemoModel:
         actions.motion_from_file(self.right, "place_cup.csv")
         actions.release(self.right_gripper)
         actions.motion_from_file(self.right, "post_place_cup.csv")
-        self.gui.play_sound("attention.wav")
-        self.gui.render_text("Please retrieve your cup!", *self.render_text_settings)
+        if self.gui:
+            self.gui.play_sound("attention.wav")
+            self.gui.render_text(
+                "Please retrieve your cup!", *self.render_text_settings
+            )
 
     def on_return_to_idle(self, target: statemachine.State) -> None:
         if target != DemoControl.waiting_for_user_pickup:
@@ -209,7 +225,10 @@ class DemoModel:
 
     def cup_full(self) -> bool:
         load = np.linalg.norm(self.load[:3] - self.bias[:3])
-        self.gui.show_text(f"measuring...\n{load*100:3.0f}ml", *self.show_text_settings)
+        if self.gui:
+            self.gui.show_text(
+                f"measuring...\n{load*100:3.0f}ml", *self.show_text_settings
+            )
         return bool(load > 3.5)
 
     def user_pickup(self) -> bool:
