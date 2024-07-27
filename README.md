@@ -11,6 +11,7 @@ Summit 2024. Watch a video of the demo
 
 <p align="center">
 	<img src="https://raw.githubusercontent.com/tum-robotics/trinkgelage/main/.github/trinkgelage.png">
+	<img src="https://raw.githubusercontent.com/tum-robotics/trinkgelage/main/.github/statemachine.png">
 </p>
 
 ## Install
