@@ -15,7 +15,13 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx_autodoc_typehints",
     "sphinx_copybutton",
+    "sphinx_reredirects",
 ]
+
+redirects = {
+    # index.rst just contains the table of contents definition.
+    "index": "api/trinkgelage.html",
+}
 
 source_suffix = [".rst", ".md"]
 exclude_patterns = [
